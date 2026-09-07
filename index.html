@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Barú, Table 13 — split the check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F3E9;
+    --card:#FFFDF7;
+    --ink:#141F1A;
+    --ink-2:#455A51;
+    --rule:#D8D0BE;
+    --rule-soft:#E5DFD1;
+    --jade:#0F2E26;
+    --amber:#9A5B00;
+    --red:#B03A1B;
+    --pad:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:17px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:150px;
+  }
+  .wrap{max-width:660px;margin:0 auto;padding:0 var(--pad)}
+  .num{font-variant-numeric:tabular-nums}
+
+  header{padding:32px 0 16px}
+  h1{
+    font-family:"Bricolage Grotesque",Inter,sans-serif;
+    font-weight:800;font-size:clamp(32px,8.5vw,44px);
+    line-height:1.05;letter-spacing:-.02em;margin:0 0 10px;color:var(--jade);
+  }
+  .stamp{font-size:15px;color:var(--ink-2);margin:0 0 14px}
+  .lede{margin:0;max-width:44ch;color:var(--ink)}
+
+  .billstrip{
+    margin-top:22px;background:var(--card);border:1px solid var(--rule);
+    border-radius:14px;padding:16px 18px;
+    display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;
+  }
+  .billstrip div{display:flex;justify-content:space-between;gap:8px;font-size:15px;color:var(--ink-2)}
+  .billstrip b{color:var(--ink);font-weight:600}
+  .billstrip .full{grid-column:1/-1;border-top:1px solid var(--rule);padding-top:12px;font-size:17px;color:var(--ink)}
+  .billstrip .full b{color:var(--amber);font-size:19px;font-weight:700}
+
+  .namebox{margin:24px 0 4px}
+  label{display:block;font-size:15px;color:var(--ink-2);margin-bottom:6px}
+  input[type=text],input[type=number]{
+    background:#fff;border:1.5px solid var(--rule);color:var(--ink);
+    border-radius:12px;padding:14px;font:inherit;font-size:17px;width:100%;
+  }
+  input::placeholder{color:#8C9992}
+  input:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+  h2{
+    font-family:"Bricolage Grotesque",Inter,sans-serif;
+    font-weight:700;font-size:19px;color:var(--jade);
+    margin:34px 0 6px;padding-bottom:8px;border-bottom:2px solid var(--rule);
+  }
+  .item{padding:13px 0;border-bottom:1px solid var(--rule-soft)}
+  .item.picked{background:#FFF3DC;border-radius:10px;padding-left:10px;padding-right:10px;margin:0 -10px}
+  .top{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center}
+  .no{font-size:14px;color:#7A8A83;text-align:right;align-self:start;padding-top:3px}
+  .name{font-size:17px;font-weight:500;line-height:1.35}
+  .meta{font-size:15px;color:var(--ink-2);margin-top:3px}
+  .meta .price{color:var(--ink);font-weight:600}
+  .tag{display:inline-block;font-size:13px;padding:1px 8px;border-radius:999px;
+       border:1px solid var(--rule);color:var(--ink-2);margin-left:2px;white-space:nowrap}
+  .tag.comp{border-color:var(--red);color:var(--red)}
+
+  .stepper{display:flex;align-items:center;gap:5px}
+  .stepper button{
+    width:40px;height:40px;border-radius:10px;border:1.5px solid var(--rule);
+    background:#fff;color:var(--jade);font-size:22px;line-height:1;cursor:pointer;font-weight:600;
+  }
+  .stepper button:disabled{opacity:.35;cursor:default}
+  .qty{min-width:36px;text-align:center;font-weight:700;font-size:18px}
+  .qty.zero{color:#8C9992;font-weight:400}
+  .left{font-size:13px;color:#7A8A83;text-align:center;margin-top:4px;min-height:16px}
+
+  .splitrow{display:flex;justify-content:flex-end;margin-top:8px}
+  .splitbtn{
+    background:#fff;border:1.5px solid var(--rule);color:var(--ink-2);
+    border-radius:999px;padding:6px 14px;font:inherit;font-size:15px;cursor:pointer;
+  }
+  .splitbtn.open{border-color:var(--amber);color:var(--amber);font-weight:600}
+  .splitpanel{margin-top:10px;background:#fff;border:1.5px solid var(--rule);border-radius:12px;padding:14px}
+  .splitpanel p{margin:0 0 10px;font-size:15px;color:var(--ink-2)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    background:var(--paper);border:1.5px solid var(--rule);color:var(--ink);
+    border-radius:10px;padding:8px 12px;font:inherit;font-size:20px;font-weight:600;
+    cursor:pointer;min-width:56px;line-height:1.2;
+  }
+  .chip:disabled{opacity:.35;cursor:default}
+  .chip small{display:block;font-size:12px;font-weight:500;color:var(--ink-2);margin-top:2px}
+  .custom{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .custom input{width:84px;padding:9px;text-align:center}
+  .custom span{font-size:15px;color:var(--ink-2)}
+  .custom button{
+    background:var(--jade);border:0;color:#fff;border-radius:10px;
+    padding:11px 14px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;
+  }
+
+  .bar{
+    position:fixed;left:0;right:0;bottom:0;background:var(--jade);color:#F7F3E9;
+    border-radius:18px 18px 0 0;box-shadow:0 -8px 28px rgba(20,31,26,.25);
+    padding:14px var(--pad) calc(14px + env(safe-area-inset-bottom));
+  }
+  .bar .inner{max-width:660px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .bar .lines{flex:1;min-width:0}
+  .bar .row{display:flex;justify-content:space-between;font-size:14.5px;color:#B9CCC3}
+  .bar .row.total{
+    font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:30px;
+    color:#FFF;letter-spacing:-.01em;margin-top:3px;align-items:baseline;
+  }
+  .bar .row.total span:first-child{font-size:15px;font-weight:500;font-family:Inter,sans-serif;color:#B9CCC3}
+  .save{background:#F2B33C;color:#241700;border:0;border-radius:12px;
+        padding:15px 18px;font:inherit;font-size:17px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .save:disabled{opacity:.45;cursor:default}
+
+  .guest{display:flex;justify-content:space-between;align-items:center;gap:12px;
+         padding:14px 0;border-bottom:1px solid var(--rule-soft)}
+  .who{font-weight:600;font-size:17px}
+  .det{font-size:14.5px;color:var(--ink-2);margin-top:2px}
+  .amt{font-weight:700;font-size:18px;color:var(--amber)}
+  .ghost{background:#fff;border:1.5px solid var(--rule);color:var(--ink-2);
+         border-radius:10px;padding:9px 13px;font:inherit;font-size:15px;cursor:pointer}
+  .empty{color:var(--ink-2);font-size:16px;padding:16px 0}
+  .tally{margin-top:16px;background:var(--card);border:1px solid var(--rule);
+         border-radius:14px;padding:16px 18px;font-size:16px}
+  .tally div{display:flex;justify-content:space-between;padding:4px 0;color:var(--ink-2)}
+  .tally b{color:var(--ink)}
+  .tally .short b{color:var(--red)}
+  .tally .done b{color:var(--amber)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .note{font-size:15px;color:var(--ink-2);margin:22px 0 44px;line-height:1.65}
+  .toast{position:fixed;left:50%;bottom:170px;transform:translateX(-50%);
+         background:var(--jade);color:#FFF;font-weight:600;font-size:15px;
+         padding:11px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .18s ease}
+  .toast.on{opacity:1}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>What did you have at Barú?</h1>
+    <p class="stamp">Table 13 · Check #34 · September 5, 2026 · 15 guests</p>
+    <p class="lede">Claim your items below. Shared a plate? Split it any number of ways. The page works out your piece of the tax, the auto-gratuity and the card fee.</p>
+
+    <div class="billstrip num">
+      <div><span>Pre-discount</span><b>$1,305.00</b></div>
+      <div><span>Manager comp</span><b>−$180.00</b></div>
+      <div><span>Subtotal</span><b>$1,125.00</b></div>
+      <div><span>Auto-grat (20%)</span><b>$261.00</b></div>
+      <div><span>Card fee (3%)</span><b>$41.58</b></div>
+      <div><span>Tax</span><b>$125.40</b></div>
+      <div class="full"><span>Check total</span><b>$1,552.98</b></div>
+    </div>
+
+    <div class="namebox">
+      <label for="who">Your name</label>
+      <input id="who" type="text" placeholder="e.g. Marcus" autocomplete="name">
+    </div>
+  </header>
+
+  <main id="list"></main>
+
+  <h2>Who has claimed what</h2>
+  <div id="guests"></div>
+  <div class="tally num" id="tally"></div>
+  <div class="actions">
+    <button class="ghost" id="copyAll">Copy the running list</button>
+    <button class="ghost" id="clearAll">Start over</button>
+  </div>
+
+  <p class="note">
+    How the math works: the 20% auto-gratuity was charged on the pre-discount total of $1,305, so it lands at 23.2% of what the table actually owed. The 3% card fee applies to the subtotal plus gratuity, and tax applies to the subtotal plus card fee. All three ride along with each item, so every $1 of food and drink comes to $1.38. Split flat across 15 people, dinner was $103.53 a head — this page charges you for what you actually ordered instead.
+  </p>
+</div>
+
+<div class="bar">
+  <div class="inner">
+    <div class="lines num">
+      <div class="row"><span>Your items</span><span id="bSub">$0.00</span></div>
+      <div class="row"><span>Tip, card fee, tax</span><span id="bAdd">$0.00</span></div>
+      <div class="row total"><span>You owe</span><span id="bTotal">$0.00</span></div>
+    </div>
+    <button class="save" id="save" disabled>Save</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- the check, as printed ---------- */
+const SUBTOTAL = 1125.00;   // after the $180 manager comp
+const GRAT     = 261.00;    // 20% of the $1,305 pre-discount amount
+const CARDFEE  = 41.58;     // 3% of subtotal + gratuity
+const TAX      = 125.40;    // on subtotal + card fee
+const TOTAL    = 1552.98;
+
+const ITEMS = [
+  {n:1,  c:"Opening drinks", name:"Caracas Old Fashioned",         qty:2, unit:15.00},
+  {n:2,  c:"Opening drinks", name:"Maracuyá",                       qty:2, unit:15.00},
+  {n:3,  c:"Opening drinks", name:"Tropical Spritz",                qty:3, unit:9.00},
+  {n:4,  c:"Opening drinks", name:"Diet Coke, can",                 qty:1, unit:3.00},
+
+  {n:5,  c:"First courses", name:"Atún Crudo",                      qty:7, unit:56.00},
+  {n:6,  c:"First courses", name:"Chuzos de Carne (3)",             qty:1, unit:21.00},
+  {n:7,  c:"First courses", name:"Ostras Fritas",                   qty:1, unit:18.00},
+  {n:8,  c:"First courses", name:"Carimañola",                      qty:4, unit:56.00},
+  {n:9,  c:"First courses", name:"Cuajada",                         qty:2, unit:56.00},
+
+  {n:10, c:"Desserts", name:"Tres Leches",                          qty:7, unit:0, incl:true},
+  {n:11, c:"Desserts", name:"Maduros Foster",                       qty:6, unit:0, incl:true},
+  {n:12, c:"Desserts", name:"Maduros Foster Torta",                 qty:1, unit:0, incl:true, note:"with Porto"},
+
+  {n:13, c:"Mains", name:"Wagyu Vacío",                             qty:9, unit:0, incl:true},
+  {n:14, c:"Mains", name:"Wagyu Vacío",                             qty:1, unit:0, incl:true, note:"with Altos Ibéricos Rioja"},
+  {n:15, c:"Mains", name:"Chuleta Asada",                           qty:3, unit:0, incl:true},
+  {n:16, c:"Mains", name:"Pargo Rojo",                              qty:1, unit:0, incl:true},
+
+  {n:17, c:"Sides and extras", name:"Mazorca",                      qty:2, unit:11.00},
+  {n:18, c:"Sides and extras", name:"Churrasco",                    qty:1, unit:39.00, note:"medium"},
+  {n:19, c:"Sides and extras", name:"Gambas al Ajillo",             qty:1, unit:22.00, note:"1st course, same time"},
+
+  {n:20, c:"Drinks through dinner", name:"Mojito, Havana Club",     qty:3, unit:13.00},
+  {n:21, c:"Drinks through dinner", name:"Margarita de la Casa",    qty:3, unit:13.00},
+  {n:22, c:"Drinks through dinner", name:"Stella Artois",           qty:1, unit:6.00},
+  {n:23, c:"Drinks through dinner", name:"Espolón Tequila Blanco",  qty:2, unit:12.00, note:"soda water"},
+  {n:24, c:"Drinks through dinner", name:"Caipirinha de Piña",      qty:1, unit:13.00},
+  {n:25, c:"Drinks through dinner", name:"Mojito, Strawberry",      qty:1, unit:15.00},
+  {n:26, c:"Drinks through dinner", name:"Muzo",                    qty:1, unit:13.00},
+  {n:27, c:"Drinks through dinner", name:"Modelo Especial",         qty:1, unit:6.00},
+  {n:28, c:"Drinks through dinner", name:"Mojito, Havana Club",     qty:1, unit:13.00},
+  {n:29, c:"Drinks through dinner", name:"Extra shot of rum",       qty:1, unit:2.00},
+  {n:30, c:"Drinks through dinner", name:"Pepino Picoso",           qty:1, unit:15.00},
+  {n:31, c:"Drinks through dinner", name:"Espolón Tequila Blanco",  qty:15, unit:0, comp:true, note:"up · $180.00 comped by the manager"}
+];
+
+/* ---------- state ---------- */
+const KEY = "baru-check-34";
+let guests = [];
+try { const raw = localStorage.getItem(KEY); if (raw) guests = JSON.parse(raw); } catch(e){ guests = []; }
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(guests)); } catch(e){} }
+
+let draft = {};        // itemNumber -> [increments], newest last, so the minus button undoes one
+let openSplit = null;  // item number whose split panel is showing
+
+/* ---------- helpers ---------- */
+const money = n => "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const r2 = n => Math.round(n*100)/100;
+const EPS = 0.0005;
+
+const FRACTIONS = {0.5:"½",0.3333:"⅓",0.6667:"⅔",0.25:"¼",0.75:"¾",0.2:"⅕",0.4:"⅖",0.6:"⅗",0.8:"⅘",0.1667:"⅙",0.8333:"⅚",0.125:"⅛"};
+function fmtQty(x){
+  if (x < EPS) return "0";
+  const whole = Math.floor(x + EPS);
+  const rest = x - whole;
+  if (rest < EPS) return String(whole);
+  for (const [v,g] of Object.entries(FRACTIONS)){
+    if (Math.abs(rest - parseFloat(v)) < 0.002) return (whole ? whole : "") + g;
+  }
+  return x.toFixed(2);
+}
+function draftUnits(n){ return (draft[n]||[]).reduce((a,b)=>a+b,0); }
+function claimedUnits(n){ return guests.reduce((s,g)=> s + (g.picks[n]||0), 0); }
+function remaining(n){
+  const it = ITEMS.find(i=>i.n===n);
+  return Math.max(0, it.qty - claimedUnits(n) - draftUnits(n));
+}
+function subtotalOf(picks){
+  return r2(Object.entries(picks).reduce((s,[n,u]) => {
+    const it = ITEMS.find(i=>i.n===+n);
+    return s + it.unit * u;
+  }, 0));
+}
+function billFor(picks){
+  const sub = subtotalOf(picks);
+  const share = sub / SUBTOTAL;
+  const grat = r2(share*GRAT), fee = r2(share*CARDFEE), tax = r2(share*TAX);
+  return { sub, grat, fee, tax, add: r2(grat+fee+tax), total: r2(sub+grat+fee+tax) };
+}
+function draftPicks(){
+  const p = {};
+  for (const n in draft){ const u = draftUnits(n); if (u > EPS) p[n] = u; }
+  return p;
+}
+
+/* ---------- render ---------- */
+const list = document.getElementById("list");
+const GLYPH = {2:"½",3:"⅓",4:"¼",5:"⅕",6:"⅙"};
+
+function renderList(){
+  let html = "", course = null;
+  for (const it of ITEMS){
+    if (it.c !== course){ course = it.c; html += `<h2>${course}</h2>`; }
+    const mine = draftUnits(it.n), left = remaining(it.n);
+    const tag = it.comp ? `<span class="tag comp">comped</span>`
+              : it.incl ? `<span class="tag">no charge</span>` : "";
+    const price = it.unit > 0
+      ? `<span class="price">${money(it.unit)}</span> each · ${it.qty} ordered`
+      : `$0.00 · ${it.qty} ordered`;
+
+    let panel = "";
+    if (openSplit === it.n){
+      const chips = [2,3,4,5,6].map(w => {
+        const ok = left >= 1/w - EPS;
+        return `<button class="chip" data-frac="${it.n}:${w}" ${ok?"":"disabled"}>
+                  ${GLYPH[w]}<small>${money(r2(it.unit/w))}</small>
+                </button>`;
+      }).join("");
+      panel = `<div class="splitpanel">
+        <p>Sharing this one? Add your slice of a single ${it.name}.</p>
+        <div class="chips">${chips}</div>
+        <div class="custom">
+          <span>or split it</span>
+          <input type="number" min="2" max="15" step="1" value="7" id="ways-${it.n}" aria-label="Number of ways to split">
+          <span>ways</span>
+          <button data-custom="${it.n}">Add my share</button>
+        </div>
+      </div>`;
+    }
+
+    html += `
+      <div class="item${mine > EPS ? " picked" : ""}">
+        <div class="top">
+          <div class="no num">${it.n}</div>
+          <div>
+            <div class="name">${it.name} ${tag}</div>
+            <div class="meta num">${price}${it.note ? " · " + it.note : ""}</div>
+          </div>
+          <div>
+            <div class="stepper">
+              <button data-minus="${it.n}" ${mine < EPS ? "disabled" : ""} aria-label="Undo last claim of ${it.name}">−</button>
+              <span class="qty num${mine > EPS ? "" : " zero"}">${fmtQty(mine)}</span>
+              <button data-plus="${it.n}" ${left < 1 - EPS ? "disabled" : ""} aria-label="Add one ${it.name}">+</button>
+            </div>
+            <div class="left num">${left < EPS ? "all claimed" : fmtQty(left) + " left"}</div>
+          </div>
+        </div>
+        <div class="splitrow">
+          <button class="splitbtn${openSplit === it.n ? " open" : ""}" data-split="${it.n}" ${left < EPS ? "disabled" : ""}>
+            ${openSplit === it.n ? "Close" : "Split this"}
+          </button>
+        </div>
+        ${panel}
+      </div>`;
+  }
+  list.innerHTML = html;
+}
+
+function renderBar(){
+  const b = billFor(draftPicks());
+  document.getElementById("bSub").textContent = money(b.sub);
+  document.getElementById("bAdd").textContent = money(b.add);
+  document.getElementById("bTotal").textContent = money(b.total);
+  document.getElementById("save").disabled =
+    !document.getElementById("who").value.trim() || Object.keys(draftPicks()).length === 0;
+}
+
+function renderGuests(){
+  const box = document.getElementById("guests");
+  if (!guests.length){
+    box.innerHTML = `<div class="empty">Nobody has claimed anything yet. Put your name in, tap what you had, then save.</div>`;
+  } else {
+    box.innerHTML = guests.map((g,i) => {
+      const b = billFor(g.picks);
+      const count = Object.values(g.picks).reduce((s,u)=>s+u,0);
+      return `<div class="guest">
+        <div>
+          <div class="who">${g.name}</div>
+          <div class="det num">${fmtQty(count)} item${Math.abs(count-1)<EPS?"":"s"} · ${money(b.sub)} + ${money(b.add)} tip, fee &amp; tax</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="amt num">${money(b.total)}</div>
+          <button class="ghost" data-del="${i}" aria-label="Remove ${g.name}">Undo</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+  const collected = r2(guests.reduce((s,g)=> s + billFor(g.picks).total, 0));
+  const short = r2(TOTAL - collected);
+  document.getElementById("tally").innerHTML = `
+    <div><span>Claimed so far</span><b>${money(collected)}</b></div>
+    <div><span>Check total</span><b>${money(TOTAL)}</b></div>
+    <div class="${short > 0.005 ? "short" : "done"}">
+      <span>${short > 0.005 ? "Still unclaimed" : "Covered in full"}</span><b>${money(Math.abs(short))}</b>
+    </div>`;
+}
+
+function renderAll(){ renderList(); renderBar(); renderGuests(); }
+
+/* ---------- events ---------- */
+function addUnits(n, amount){
+  if (remaining(n) < amount - EPS) { toast("Not that much left on the check"); return; }
+  (draft[n] = draft[n] || []).push(amount);
+}
+
+list.addEventListener("click", e => {
+  const plus = e.target.closest("[data-plus]");
+  const minus = e.target.closest("[data-minus]");
+  const split = e.target.closest("[data-split]");
+  const frac = e.target.closest("[data-frac]");
+  const custom = e.target.closest("[data-custom]");
+
+  if (plus){ addUnits(+plus.dataset.plus, 1); }
+  else if (minus){
+    const n = +minus.dataset.minus;
+    if (draft[n] && draft[n].length) draft[n].pop();
+    if (draft[n] && !draft[n].length) delete draft[n];
+  }
+  else if (split){
+    const n = +split.dataset.split;
+    openSplit = openSplit === n ? null : n;
+  }
+  else if (frac){
+    const [n, ways] = frac.dataset.frac.split(":").map(Number);
+    addUnits(n, Math.round(10000/ways)/10000);
+  }
+  else if (custom){
+    const n = +custom.dataset.custom;
+    const ways = Math.min(15, Math.max(2, parseInt(document.getElementById("ways-"+n).value, 10) || 2));
+    addUnits(n, Math.round(10000/ways)/10000);
+  }
+  else return;
+  renderAll();
+});
+
+document.getElementById("who").addEventListener("input", renderBar);
+
+document.getElementById("save").addEventListener("click", () => {
+  const name = document.getElementById("who").value.trim();
+  const picks = draftPicks();
+  if (!name || !Object.keys(picks).length) return;
+  const b = billFor(picks);
+  guests.push({ name, picks });
+  persist();
+  draft = {}; openSplit = null;
+  document.getElementById("who").value = "";
+  renderAll();
+  toast(`${name} owes ${money(b.total)}`);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+document.getElementById("guests").addEventListener("click", e => {
+  const del = e.target.closest("[data-del]");
+  if (!del) return;
+  guests.splice(+del.dataset.del, 1);
+  persist(); renderAll();
+});
+
+document.getElementById("copyAll").addEventListener("click", () => {
+  const lines = guests.map(g => `${g.name}: ${money(billFor(g.picks).total)}`);
+  const collected = r2(guests.reduce((s,g)=> s + billFor(g.picks).total, 0));
+  lines.push(`Claimed ${money(collected)} of ${money(TOTAL)}`);
+  const text = lines.join("\n");
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(()=>toast("Copied"), ()=>toast("Copy failed"));
+  else toast("Copying is not available here");
+});
+
+document.getElementById("clearAll").addEventListener("click", () => {
+  if (!confirm("Clear everyone and start the split over?")) return;
+  guests = []; draft = {}; openSplit = null; persist(); renderAll();
+});
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("on"), 2200);
+}
+
+renderAll();
+</script>
+</body>
+</html>
